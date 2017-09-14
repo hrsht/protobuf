@@ -988,6 +988,7 @@ static void putary(VALUE ary, const upb_fielddef *f, upb_sink *sink,
   int size;
 
   if (ary == Qnil) return;
+  if (!emit_defaults && NUM2INT(RepeatedField_length(ary)) == 0) return;
 
   upb_sink_startseq(sink, getsel(f, UPB_HANDLER_STARTSEQ), &subsink);
 
@@ -1086,6 +1087,8 @@ static void putmap(VALUE map, const upb_fielddef *f, upb_sink *sink,
   Map_iter it;
 
   if (map == Qnil) return;
+  if (!emit_defaults && Map_length(map) == 0) return;
+
   self = ruby_to_Map(map);
 
   upb_sink_startseq(sink, getsel(f, UPB_HANDLER_STARTSEQ), &subsink);
