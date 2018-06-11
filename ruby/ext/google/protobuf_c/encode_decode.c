@@ -202,7 +202,7 @@ static void* appendstr_handler(void *closure,
 static void set_hasbit(void *closure, int32_t hasbit) {
   if (hasbit > 0) {
     uint8_t* storage = closure;
-    *(uint8_t*)&storage[hasbit / 8] |= 1 << (hasbit % 8);
+    storage[hasbit/8] |= 1 << (hasbit % 8);
   }
 }
 
@@ -305,6 +305,7 @@ static void *submsg_handler(void *closure, const void *hd) {
 
   submsg_rb = DEREF(msg, submsgdata->ofs, VALUE);
   TypedData_Get_Struct(submsg_rb, MessageHeader, &Message_type, submsg);
+
   return submsg;
 }
 
@@ -571,9 +572,7 @@ static void add_handlers_for_singular_field(upb_handlers *h,
                                             size_t offset,
                                             size_t hasbit_off) {
   // The offset we pass to UPB points to the start of the Message, rather than the start of where our data is stored.
-  // Which works out to the size of a pointer. Since we can't pass arbitrary pointers to UPB, we bump it by the size*8
-  // which lets us reuse the UPB writers for primitives.
-  int32_t hasbit = hasbit_off == MESSAGE_FIELD_NO_HASBIT ? -1 : hasbit_off + sizeof(void*) * 8;
+  int32_t hasbit = hasbit_off == MESSAGE_FIELD_NO_HASBIT ? -1 : hasbit_off + sizeof(MessageHeader) * 8;
 
   switch (upb_fielddef_type(f)) {
     case UPB_TYPE_BOOL:

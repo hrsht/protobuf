@@ -428,7 +428,7 @@ MessageLayout* create_layout(const upb_msgdef* msgdef) {
 
   layout->fields = ALLOC_N(MessageField, nfields);
 
-  size_t hasbit = sizeof(void*) * 8;
+  size_t hasbit = 0;
   for (upb_msg_field_begin(&it, msgdef);
        !upb_msg_field_done(&it);
        upb_msg_field_next(&it)) {
@@ -440,7 +440,7 @@ MessageLayout* create_layout(const upb_msgdef* msgdef) {
     }
   }
 
-  if (hasbit != sizeof(void*) * 8) {
+  if (hasbit != 0) {
     off += (hasbit + 8 - 1) / 8;
   }
 
@@ -572,7 +572,7 @@ static void slot_set_hasbit(MessageLayout* layout,
   size_t hasbit = layout->fields[upb_fielddef_index(field)].hasbit;
   assert(hasbit != MESSAGE_FIELD_NO_HASBIT);
 
-  *(uint8_t*)&((uint8_t*)storage)[hasbit / 8] |= 1 << (hasbit % 8);
+  ((uint8_t*)storage)[hasbit / 8] |= 1 << (hasbit % 8);
 }
 
 static void slot_clear_hasbit(MessageLayout* layout,
@@ -580,7 +580,7 @@ static void slot_clear_hasbit(MessageLayout* layout,
                               const upb_fielddef* field) {
   size_t hasbit = layout->fields[upb_fielddef_index(field)].hasbit;
   assert(hasbit != MESSAGE_FIELD_NO_HASBIT);
-  *(uint8_t*)&((uint8_t*)storage)[hasbit / 8] &= ~(1 << (hasbit % 8));
+  ((uint8_t*)storage)[hasbit / 8] &= ~(1 << (hasbit % 8));
 }
 
 static bool slot_is_hasbit_set(MessageLayout* layout,
@@ -824,8 +824,7 @@ void layout_set(MessageLayout* layout,
     check_repeated_field_type(val, field);
     DEREF(memory, VALUE) = val;
   } else {
-    native_slot_set(upb_fielddef_type(field), field_type_class(field),
-                        memory, val);
+    native_slot_set(upb_fielddef_type(field), field_type_class(field), memory, val);
   }
 
   if (layout->fields[upb_fielddef_index(field)].hasbit != MESSAGE_FIELD_NO_HASBIT) {

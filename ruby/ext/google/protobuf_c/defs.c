@@ -1902,22 +1902,9 @@ void Builder_register(VALUE module) {
   rb_define_method(klass, "initialize", Builder_initialize, 1);
   rb_define_method(klass, "add_message", Builder_add_message, 1);
   rb_define_method(klass, "add_enum", Builder_add_enum, 1);
-  rb_define_method(klass, "initialize", Builder_initialize, 0);
   rb_define_method(klass, "finalize_to_pool", Builder_finalize_to_pool, 1);
   rb_gc_register_address(&cBuilder);
   cBuilder = klass;
-}
-
-/*
- * call-seq:
- *     Builder.new(d) => builder
- *
- * Create a new message builder.
- */
-VALUE Builder_initialize(VALUE _self) {
-  DEFINE_SELF(Builder, self, _self);
-  self->pending_list = rb_ary_new();
-  return Qnil;
 }
 
 /*
@@ -1930,6 +1917,7 @@ VALUE Builder_initialize(VALUE _self) {
 VALUE Builder_initialize(VALUE _self, VALUE file_descriptor_rb) {
   DEFINE_SELF(Builder, self, _self);
   self->file_descriptor = file_descriptor_rb;
+  self->pending_list = rb_ary_new();
   return Qnil;
 }
 
