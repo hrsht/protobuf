@@ -1,0 +1,33 @@
+syntax = "proto2";
+
+import "google/protobuf/descriptor.proto";
+
+package pkg;
+
+option (pkg.file_option) = "foo";
+
+extend google.protobuf.MessageOptions {
+  optional MyOption my_option = 1234567;
+}
+
+message MyOption {
+  // This will become an option on message M, but its value is also
+  // an instance of the M message.  This is really tricky because it
+  // implies that you need to be able to create an M message while
+  // you are defining it.
+  //
+  // The protobuf library generally deals with this by encoding options
+  // as serialized protos, and only parsing them once the message
+  // types are defined.
+  option (pkg.my_option) = {val: 999};
+  optional int32 val = 1;
+}
+
+extend google.protobuf.FieldOptions {
+  optional bool required = 123456;
+  optional MyOption my_option_field = 123457;
+}
+
+extend google.protobuf.FileOptions {
+  optional string file_option = 123456; 
+}

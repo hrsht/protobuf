@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+import "custom_options.proto";
+
+package a.b.c;
+
+message TestMessage {
+  optional int32 optional_int32 = 1 [(pkg.required) = true];
+  optional int64 optional_int64 = 2;
+
+  required int32 required_int32 = 3;
+}

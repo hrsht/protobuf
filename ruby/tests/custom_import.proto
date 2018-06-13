@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+import "custom_options.proto";
+
+message TestMessage {
+  option (pkg.my_option) = { val: 1000 };
+
+  extensions 100 to max;
+}
+
+extend TestMessage {
+  optional int32 optional_int = 101 [(pkg.required) = true];
+}
+
+message NestedExtension {
+  extend TestMessage {
+    optional string str = 1001 [(pkg.my_option_field) = {val: 1001}];
+  }
+
+  message NestedMessage {
+    optional string foo = 1;
+  }
+}
